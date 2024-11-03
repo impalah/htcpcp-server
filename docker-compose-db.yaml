@@ -1,0 +1,101 @@
+version: '3.8'
+# Launch only the database
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+  db-postgresql:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test123
+      - POSTGRES_DB=mytemplate
+    volumes:
+      # - ./data/postgres:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
+  # db-mysql:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.mysql
+  #   # image: mysql:5.7
+  #   ports:
+  #     - "3306:3306"
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD=Replication_2024
+  #     - MYSQL_DATABASE=mytemplate
+  #     - MYSQL_USER=test
+  #     - MYSQL_PASSWORD=Replication_2024
+  #     - MYSQL_LOG_BIN=1
+  #   volumes:
+  #     - mysql-data:/var/lib/mysql
+  #     # - ./mysql-conf.d:/etc/mysql/conf.d
+  db-mysql:
+    image: mysql:8
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=test123
+      - MYSQL_DATABASE=mytemplate
+      - MYSQL_USER=test
+      - MYSQL_PASSWORD=test123
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    ports:
+      - "4317:4317"
+      - "55680:55680"
+    volumes:
+      - ./otel-config.yml:/etc/otel-config.yml
+    command:
+      --config=/etc/otel-config.yml
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "14250:14250"
+      - "4318:4318"    # OTLP HTTP (v1/traces)
+      - "14268:14268"  # Jaeger HTTP Thrift
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+
+volumes:
+  grafana-data:
+    driver: local
+  postgres-data:
+    driver: local
+    # external: true
+  redis-data:
+    driver: local
+    # external: true
+  mysql-data:
+    driver: local
+    # external: true
+  # mysql8-data:
+  #   driver: local

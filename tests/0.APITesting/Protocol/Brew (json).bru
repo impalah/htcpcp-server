@@ -1,0 +1,33 @@
+meta {
+  name: Brew (json)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{host}}/api/v1/htcpcp
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "id": "123456",
+    "coffee_type": "Latte Machiatto",
+    "sugar": 3,
+    "milk": false
+  }
+  
+}
+
+body:text {
+  id:123456
+  coffee_type:Latte Machiatto
+  sugar:3
+  milk:false
+  
+}

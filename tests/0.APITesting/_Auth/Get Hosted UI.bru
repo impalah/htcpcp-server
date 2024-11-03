@@ -1,0 +1,18 @@
+meta {
+  name: Get Hosted UI
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{hosted_ui_url}}
+  body: none
+  auth: none
+}
+
+params:query {
+  client_id: {{hosted_ui_client_id}}
+  response_type: code
+  scope: email openid phone profile
+  redirect_uri: http://localhost:4200
+}
