@@ -12,6 +12,7 @@ class PotStatusEnum(enum.Enum):
     BREWING = "brewing"
     BREWED = "brewed"
     CLEANING = "cleaning"
+    EMPTY = "empty"
     ERROR = "error"
 
     def __str__(self):

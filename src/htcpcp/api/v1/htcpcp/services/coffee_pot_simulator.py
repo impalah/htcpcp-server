@@ -1,12 +1,15 @@
 import asyncio
 import random
 
-from fastapi import FastAPI, HTTPException
-
 from htcpcp.core.logging import logger
 from htcpcp.core.settings import settings
+from htcpcp.domain.entities.coffee_order import CoffeeOrder
+from htcpcp.domain.entities.pickup_order import PickupOrder
 from htcpcp.domain.entities.pot_status import PotStatus
 from htcpcp.domain.exceptions.im_a_teapot_exception import ImATeapotException
+from htcpcp.domain.exceptions.pickup_order_not_found_exception import (
+    PickupOrderNotFoundException,
+)
 from htcpcp.domain.exceptions.pot_not_available_exception import (
     PotNotAvailableException,
 )
@@ -27,6 +30,7 @@ class CoffeePotSimulator:
     _bean_level: int = 0
     _temperature: int = 0
     _teapot: bool = False
+    _current_order: CoffeeOrder | None = None
 
     _instance = None
 
@@ -39,7 +43,7 @@ class CoffeePotSimulator:
             cls._instance.lock = asyncio.Lock()  # To prevent race conditions
         return cls._instance
 
-    async def brew(self) -> bool:
+    async def brew(self, order: CoffeeOrder) -> bool:
         logger.debug("Entering. Brewing")
         async with self.lock:
 
@@ -53,6 +57,7 @@ class CoffeePotSimulator:
                 raise PotNotAvailableException(id="1234")
 
             logger.debug("Coffee pot is available")
+            self._current_order = order
             self.state = PotStatusEnum.BREWING
 
             # Start brewing
@@ -66,20 +71,27 @@ class CoffeePotSimulator:
         logger.debug("Coffee pot is ready")
         self.state = PotStatusEnum.BREWED
 
-    async def pickup(self) -> bool:
+    async def pickup(self, pickup_order: PickupOrder) -> CoffeeOrder | None:
         logger.debug("Entering. Pickup")
         async with self.lock:
 
             # Check if the pot is available
             if self.state != PotStatusEnum.BREWED:
                 logger.error("No order to pickup")
-                raise PotNotAvailableException(id="1234")
+                raise PotNotAvailableException(id=settings.COFFEE_POT_ID)
 
+            order: CoffeeOrder = self._current_order
+            logger.debug(f"Order to pickup: {order}")
+
+            if order.id != pickup_order.id:
+                logger.error("Order not found")
+                raise PickupOrderNotFoundException(id=pickup_order.id)
+
+            self._current_order = None
             self.state = PotStatusEnum.CLEANING
 
-            # Start brewing
             asyncio.create_task(self._finish_cleaning())
-            return True
+            return order
 
     async def _finish_cleaning(self):
         # TODO: timer as setting

@@ -1,2 +1,0 @@
-class SettingsNotFoundException(Exception):
-    pass

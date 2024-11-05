@@ -4,8 +4,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from htcpcp.core.logging import trace_id_context
 
-app = FastAPI()
-
 
 class TraceIDMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):

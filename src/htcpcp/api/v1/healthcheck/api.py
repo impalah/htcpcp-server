@@ -12,8 +12,6 @@ from htcpcp.core.settings import settings
 
 from .response import HealthCheckResponse
 
-# from .services import HealthcheckService
-
 api_router = APIRouter()
 
 
@@ -43,9 +41,4 @@ async def get(
 
     logger.debug("Healthcheck started")
 
-    # if await HealthcheckService().verify():
-    #     logger.debug("Healthcheck successful")
     return HealthCheckResponse(status="Healthy", version=settings.PROJECT_VERSION)
-    # else:
-    #     logger.debug("Healthcheck failed")
-    #     raise HTTPException(status_code=503, detail="Unhealthy")

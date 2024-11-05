@@ -5,8 +5,6 @@ from fastapi import APIRouter
 
 from . import api_htcpcp
 
-# from . import api_addresses, api_policies
-
 ROUTE_PREFIX: str = "/api/v1/htcpcp"
 
 api_router = APIRouter()
