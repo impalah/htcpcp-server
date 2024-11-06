@@ -172,3 +172,36 @@ async def pickup_coffee(
     )
 
     return coffee_response
+
+
+@api_router.delete(
+    "/",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses={
+        status.HTTP_403_FORBIDDEN: {
+            "model": ProblemDetail,
+        },
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "model": ProblemDetail,
+            "description": "Internal Server Error",
+        },
+    },
+)
+async def reset_device(
+    request: Request,
+    response: Response,
+):
+    """Resets the device to ready, whatever its state may be.
+
+    Args:
+        request (Request): _description_
+        response (Response): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
+    logger.debug("Resetting the device")
+
+    await CoffeeHubService().reset()
+    return

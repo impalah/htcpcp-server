@@ -12,7 +12,6 @@ class Settings:
     PROJECT_NAME: str = config("PROJECT_NAME", cast=str, default="HTCPCP API")
     PROJECT_VERSION: str = config("PROJECT_VERSION", cast=str, default="1.0.0")
 
-    RESOURCES_PATH: str = config("RESOURCES_PATH", cast=str, default="")
     LOG_LEVEL: str = config("LOG_LEVEL", cast=str, default="INFO").upper()
     LOG_FORMAT: str = config(
         "LOG_FORMAT",
@@ -33,47 +32,8 @@ class Settings:
         config("CORS_ALLOWED_HEADERS", cast=str, default='["*"]')
     )
 
-    # Database basic configuration
-    INITIALIZE_DATABASE = config("INITIALIZE_DATABASE", cast=bool, default=True)
-    HEALTHCHECK_DATABASE = config("HEALTHCHECK_DATABASE", cast=bool, default=False)
-
-    # Cache settings
-    CACHE_ENABLED = config("CACHE_ENABLED", cast=bool, default=True)
-    CACHE_CONFIG: Dict[str, Any] = json.loads(
-        config(
-            "CACHE_CONFIG",
-            cast=str,
-            default=json.dumps(
-                {
-                    "default": {
-                        "cache": "aiocache.RedisCache",
-                        "endpoint": "127.0.0.1",
-                        "port": 6379,
-                        "db": 0,
-                        "timeout": 5,
-                        "serializer": {"class": "aiocache.serializers.JsonSerializer"},
-                        "plugins": [
-                            {"class": "aiocache.plugins.HitMissRatioPlugin"},
-                            {"class": "aiocache.plugins.TimingPlugin"},
-                        ],
-                    },
-                    "cache_redis_db1": {
-                        "cache": "aiocache.RedisCache",
-                        "endpoint": "127.0.0.1",
-                        "port": 6379,
-                        "db": 1,
-                        "timeout": 5,
-                        "serializer": {"class": "aiocache.serializers.JsonSerializer"},
-                        "plugins": [
-                            {"class": "aiocache.plugins.HitMissRatioPlugin"},
-                            {"class": "aiocache.plugins.TimingPlugin"},
-                        ],
-                    },
-                }
-            ),
-        )
-    )
-
+    # Open telemetry settings
+    OTEL_ENABLED = config("OTEL_ENABLED", cast=bool, default=False)
     OTEL_SERVICE_NAME: str = config(
         "OTEL_SERVICE_NAME", cast=str, default="htcpcp-service"
     )
@@ -81,6 +41,7 @@ class Settings:
         "OTEL_EXPORTER_OTLP_ENDPOINT", cast=str, default="http://otel-collector:4317"
     )
 
+    # Coffee Pot settings
     COFFEE_POT_ID = config("COFFEE_POT_ID", cast=str, default="1234")
     COFFEE_POT_NAME = config("COFFEE_POT_NAME", cast=str, default="Coffee Pot")
     COFFEE_POT_LOCATION = config("COFFEE_POT_LOCATION", cast=str, default="Kitchen")

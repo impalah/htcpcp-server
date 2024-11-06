@@ -17,7 +17,7 @@ from htcpcp.domain.types.pot_status_enum import PotStatusEnum
 
 
 class CoffeePotSimulator:
-    """Coffe pot simulator as singleton.
+    """Coffe pot simulator as a singleton.
 
     Raises:
         HTTPException: _description_
@@ -41,6 +41,8 @@ class CoffeePotSimulator:
             cls._instance._teapot = settings.COFFEE_POT_TEAPOT
             cls._instance.state = PotStatusEnum.READY
             cls._instance.lock = asyncio.Lock()  # To prevent race conditions
+            cls._instance.tasks = []  # List to keep track of tasks
+
         return cls._instance
 
     async def brew(self, order: CoffeeOrder) -> bool:
@@ -61,7 +63,8 @@ class CoffeePotSimulator:
             self.state = PotStatusEnum.BREWING
 
             # Start brewing
-            asyncio.create_task(self._finish_brewing())
+            task = asyncio.create_task(self._finish_brewing())
+            self.tasks.append(task)
             return True
 
     async def _finish_brewing(self):
@@ -90,7 +93,9 @@ class CoffeePotSimulator:
             self._current_order = None
             self.state = PotStatusEnum.CLEANING
 
-            asyncio.create_task(self._finish_cleaning())
+            task = asyncio.create_task(self._finish_cleaning())
+            self.tasks.append(task)
+
             return order
 
     async def _finish_cleaning(self):
@@ -131,6 +136,25 @@ class CoffeePotSimulator:
             temperature=self._temperature,
         )
         return result
+
+    async def reset(self) -> None:
+        """Reset the coffee pot to ready state."""
+        logger.debug("Entering. Reset")
+
+        async with self.lock:
+
+            # Cancel all running tasks
+            for task in self.tasks:
+                task.cancel()
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    pass
+            self.tasks.clear()
+
+            self.state = PotStatusEnum.READY
+            self._current_order = None
+            return
 
 
 # Create an instance of the simulator

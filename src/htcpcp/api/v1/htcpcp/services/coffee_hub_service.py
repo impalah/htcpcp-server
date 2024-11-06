@@ -60,8 +60,6 @@ class CoffeeHubService:
 
         logger.debug(f"Entering. pick up: {pickup_order}")
 
-        # TODO: check if the order is available.
-
         # simulate brewing
         logger.debug("Brewing coffee")
         result: CoffeeOrder | None = await coffee_pot_simulator.pickup(
@@ -69,3 +67,9 @@ class CoffeeHubService:
         )
 
         return result
+
+    async def reset(self) -> None:
+        """Resets the coffeepot, no matter its state."""
+        logger.debug("Entering. Getting status")
+        await coffee_pot_simulator.reset()
+        return

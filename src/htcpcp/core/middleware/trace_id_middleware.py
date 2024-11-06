@@ -6,6 +6,12 @@ from htcpcp.core.logging import trace_id_context
 
 
 class TraceIDMiddleware(BaseHTTPMiddleware):
+    """Middleware to generate a trace_id for each request
+
+    Args:
+        BaseHTTPMiddleware (_type_): _description_
+    """
+
     async def dispatch(self, request: Request, call_next):
         # Generar un UUID como trace_id
         trace_id = str(Ksuid())

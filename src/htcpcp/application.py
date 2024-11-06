@@ -36,20 +36,24 @@ def start_application(app: FastAPI):
     # OpenTelemetry instrumentation
     # ----------------------------------------
 
-    logger.debug("Initializing OpenTelemetry")
-    resource = Resource.create(attributes={"service.name": settings.OTEL_SERVICE_NAME})
-    trace_provider = TracerProvider(resource=resource)
-    trace.set_tracer_provider(trace_provider)
+    if settings.OTEL_ENABLED:
 
-    otlp_exporter = OTLPSpanExporter(
-        endpoint=settings.OTEL_EXPORTER_OTLP_ENDPOINT, insecure=True
-    )
-    span_processor = BatchSpanProcessor(otlp_exporter)
-    trace_provider.add_span_processor(span_processor)
+        logger.debug("Initializing OpenTelemetry")
+        resource = Resource.create(
+            attributes={"service.name": settings.OTEL_SERVICE_NAME}
+        )
+        trace_provider = TracerProvider(resource=resource)
+        trace.set_tracer_provider(trace_provider)
 
-    # FastAPI instrumentation
-    FastAPIInstrumentor.instrument_app(app)
-    logger.debug("OpenTelemetry initialized")
+        otlp_exporter = OTLPSpanExporter(
+            endpoint=settings.OTEL_EXPORTER_OTLP_ENDPOINT, insecure=True
+        )
+        span_processor = BatchSpanProcessor(otlp_exporter)
+        trace_provider.add_span_processor(span_processor)
+
+        # FastAPI instrumentation
+        FastAPIInstrumentor.instrument_app(app)
+        logger.debug("OpenTelemetry initialized")
 
     # ----------------------------------------
     # Dependency injection

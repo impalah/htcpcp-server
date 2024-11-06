@@ -28,19 +28,6 @@ def add_trace_id(record) -> bool:
     return True  # Return True to indicate the filter passed
 
 
-# Create a handler to send the logs to OpenTelemetry
-class OpenTelemetryHandler(logging.Handler):
-    def emit(self, record) -> None:
-        tracer = trace.get_tracer(__name__)
-        with tracer.start_as_current_span(
-            "loguru-span", kind=SpanKind.INTERNAL
-        ) as span:
-            span.set_attribute("loguru.message", record.getMessage())
-            span.set_status(Status(StatusCode.OK))
-            if record.exc_info:
-                span.record_exception(record.exc_info[1])
-
-
 # Configure the logger
 logger.remove()
 
@@ -57,13 +44,27 @@ logger.add(
     enqueue=True,
 )
 
-# OpenTelemetry Logger
-logger.add(
-    OpenTelemetryHandler(),
-    level=settings.LOG_LEVEL,
-    format=settings.LOG_FORMAT,
-    filter=add_trace_id,
-)
+
+if settings.OTEL_ENABLED:
+    # Create a handler to send the logs to OpenTelemetry
+    class OpenTelemetryHandler(logging.Handler):
+        def emit(self, record) -> None:
+            tracer = trace.get_tracer(__name__)
+            with tracer.start_as_current_span(
+                "loguru-span", kind=SpanKind.INTERNAL
+            ) as span:
+                span.set_attribute("loguru.message", record.getMessage())
+                span.set_status(Status(StatusCode.OK))
+                if record.exc_info:
+                    span.record_exception(record.exc_info[1])
+
+    # OpenTelemetry Logger
+    logger.add(
+        OpenTelemetryHandler(),
+        level=settings.LOG_LEVEL,
+        format=settings.LOG_FORMAT,
+        filter=add_trace_id,
+    )
 
 
 __all__ = [
@@ -86,6 +87,9 @@ class InterceptHandler(logging.Handler):
         loguru_logger.log(record.levelname, record.getMessage())
 
 
-# Configure the logging level for sqlalchemy
-logging.basicConfig(handlers=[InterceptHandler()], level=logging.INFO)
-logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
+# # Configure the logging level for sqlalchemy
+# logging.basicConfig(handlers=[InterceptHandler()], level=logging.INFO)
+# logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
+# logging.getLogger("sqlalchemy.pool").setLevel(logging.INFO)
+# logging.getLogger("sqlalchemy.dialects").setLevel(logging.INFO)
+# logging.getLogger("sqlalchemy.orm").setLevel(logging.INFO)

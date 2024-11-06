@@ -1,0 +1,80 @@
+version: '3.8'
+services:
+  api:
+    networks:
+      - app-network
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        package_name: htcpcp
+    ports:
+      - 8000:8000
+    environment:
+      - LOGGER_NAME=htcpcp.Engine
+      - LOG_LEVEL=DEBUG
+      - AUTH_MIDDLEWARE_DISABLED=true
+      - AUTH_MIDDLEWARE_LOG_LEVEL=DEBUG
+      - AUTH_PROVIDER_AWS_COGNITO_USER_POOL_ID=eu-west-1_StvNqnuLv
+      - AUTH_PROVIDER_AWS_COGNITO_USER_POOL_REGION=eu-west-1
+      - OTEL_ENABLED=true
+      - OTEL_SERVICE_NAME=htcpcp
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
+      - COFFEE_POT_ID=12345678
+      - COFFEE_POT_NAME=MyCoffeePot
+      - COFFEE_POT_LOCATION=OfficeKitchen
+      - COFFEE_POT_TEAPOT=false
+
+  otel-collector:
+    networks:
+      - app-network
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    ports:
+      - "4317:4317"
+      - "55680:55680"
+    volumes:
+      - ./otel-config.yml:/etc/otel-config.yml
+    command:
+      --config=/etc/otel-config.yml
+
+  jaeger:
+    networks:
+      - app-network
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "14250:14250"
+      - "4318:4318"    # OTLP HTTP (v1/traces)
+      - "14268:14268"  # Jaeger HTTP Thrift
+
+  prometheus:
+    networks:
+      - app-network
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    networks:
+      - app-network
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  grafana-data:
+    driver: local
