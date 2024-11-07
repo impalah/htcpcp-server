@@ -100,7 +100,7 @@ jobs:
           sbom: true
           push: true
           provenance: mode=max
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           tags: |
             ${{ vars.DOCKER_HUB_REPOSITORY_NAME }}:${{ env.IMAGE_TAG }}
             ${{ vars.DOCKER_HUB_REPOSITORY_NAME }}:${{ env.IMAGE_BUILD_TAG }}
