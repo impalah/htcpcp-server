@@ -67,7 +67,7 @@ jobs:
       - name: Read version and set ImageTag
         id: version
         run: |
-          VERSION=$(cat ${{ github.workspace }}/VERSION.txt)
+          VERSION=$(poetry version | cut -d ' ' -f 2)
           echo "IMAGE_TAG=${VERSION}" >> $GITHUB_ENV
           echo "IMAGE_BUILD_TAG=${VERSION}.${{ github.run_number }}" >> $GITHUB_ENV
 
