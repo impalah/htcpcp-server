@@ -5,7 +5,11 @@ meta {
 }
 
 delete {
-  url: {{host}}/api/v1/htcpcp
+  url: {{host}}/api/v1/htcpcp/
   body: none
-  auth: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
 }

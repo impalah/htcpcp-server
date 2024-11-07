@@ -5,6 +5,7 @@
 import random
 from typing import Annotated, Union
 
+from auth_middleware import require_groups, require_user
 from fastapi import APIRouter, Body, Depends, status
 from ksuid import Ksuid
 from starlette.requests import Request
@@ -37,6 +38,11 @@ api_router = APIRouter()
             "description": "Internal Server Error",
         },
     },
+    dependencies=[
+        # Depends(require_permissions(["persons.list", "persons.read"])),
+        Depends(require_groups(["user", "administrator"])),
+        Depends(require_user()),
+    ],
 )
 async def get_status(
     request: Request,
@@ -51,6 +57,8 @@ async def get_status(
     Returns:
         PotStatus: the pot status
     """
+
+    # logger.debug("Current user: {}", request.state.current_user)
 
     # Connect with pot simulator and get real status
     return await CoffeeHubService().get_coffee_pot_status()
@@ -87,6 +95,11 @@ async def get_status(
             "message": "Internal Server Error",
         },
     },
+    dependencies=[
+        # Depends(require_permissions(["persons.list", "persons.read"])),
+        Depends(require_groups(["user", "administrator"])),
+        Depends(require_user()),
+    ],
 )
 async def brew_coffee(
     request: Request,
@@ -147,6 +160,11 @@ async def brew_coffee(
             "message": "Internal Server Error",
         },
     },
+    dependencies=[
+        # Depends(require_permissions(["persons.list", "persons.read"])),
+        Depends(require_groups(["user", "administrator"])),
+        Depends(require_user()),
+    ],
 )
 async def pickup_coffee(
     request: Request,
@@ -186,6 +204,11 @@ async def pickup_coffee(
             "description": "Internal Server Error",
         },
     },
+    dependencies=[
+        # Depends(require_permissions(["persons.list", "persons.read"])),
+        Depends(require_groups(["administrator"])),
+        Depends(require_user()),
+    ],
 )
 async def reset_device(
     request: Request,

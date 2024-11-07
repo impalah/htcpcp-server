@@ -1,11 +1,15 @@
 meta {
   name: Get Pot Status
   type: http
-  seq: 4
+  seq: 1
 }
 
 get {
-  url: {{host}}/api/v1/htcpcp
+  url: {{host}}/api/v1/htcpcp/
   body: none
-  auth: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
 }

@@ -191,6 +191,45 @@ docker-compose -f docker-compose.yaml -p my-htcpcp down
 ```
 
 
+## Lambda
+
+### Install SAM cli for testing locally
+
+(SAM CLI)[https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html]
+
+### Create a template.yaml file
+
+AWS SAM uses a template file to define your application. Here's an example of what this file might look like for your Lambda container:
+
+```yaml
+Resources:
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageUri: mylambda:latest
+```
+
+In this file, ImageUri should be the name and tag of your Docker image.
+
+### Start the AWS SAM local environment
+
+Now you can start the AWS SAM local environment with the following command:
+
+```bash
+sam local start-lambda
+```
+
+### Invoke your function
+
+You can invoke your function with the following command:
+
+```bash
+sam local invoke MyLambdaFunction
+```
+
+
+
 ## Additional help
 
 ### Opentelemetry install

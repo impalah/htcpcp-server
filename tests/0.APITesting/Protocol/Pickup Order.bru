@@ -1,17 +1,21 @@
 meta {
   name: Pickup Order
   type: http
-  seq: 5
+  seq: 4
 }
 
 patch {
-  url: {{host}}/api/v1/htcpcp
+  url: {{host}}/api/v1/htcpcp/
   body: json
-  auth: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
 }
 
 body:json {
   {
-    "id": "2oRCBesga5ELFT4rodDymLGgujL"
+    "id": "{{order_id}}"
   }
 }

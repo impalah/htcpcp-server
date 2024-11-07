@@ -207,3 +207,7 @@ playwright-report/
 .temp
 .temp/
 .temp/*
+
+*.tfvars
+*.conf
+

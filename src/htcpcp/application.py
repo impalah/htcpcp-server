@@ -1,5 +1,5 @@
-# from auth_middleware.jwt_auth_middleware import JwtAuthMiddleware
-# from auth_middleware.providers.cognito.cognito_provider import CognitoProvider
+from auth_middleware.jwt_auth_middleware import JwtAuthMiddleware
+from auth_middleware.providers.cognito.cognito_provider import CognitoProvider
 from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -90,8 +90,8 @@ def start_application(app: FastAPI):
     logger.debug("CORS initialized")
 
     # AuthMiddleware (creates current_user). Requires auth provider
-    # app.add_middleware(JwtAuthMiddleware, auth_provider=CognitoProvider())
-    # logger.debug("Auth middleware initialized")
+    app.add_middleware(JwtAuthMiddleware, auth_provider=CognitoProvider())
+    logger.debug("Auth middleware initialized")
 
     # TransactionMiddleware (creates transaction_id)
     # app.add_middleware(TransactionMiddleware)
