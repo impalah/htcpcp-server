@@ -13,13 +13,13 @@ services:
     environment:
       - LOGGER_NAME=htcpcp.Engine
       - LOG_LEVEL=DEBUG
-      - AUTH_MIDDLEWARE_DISABLED=true
+      - AUTH_MIDDLEWARE_DISABLED=false
       - AUTH_MIDDLEWARE_LOG_LEVEL=DEBUG
-      - AUTH_PROVIDER_AWS_COGNITO_USER_POOL_ID=eu-west-1_StvNqnuLv
+      - AUTH_PROVIDER_AWS_COGNITO_USER_POOL_ID=eu-west-1_NZLzZP1xc
       - AUTH_PROVIDER_AWS_COGNITO_USER_POOL_REGION=eu-west-1
       - OTEL_ENABLED=true
       - OTEL_SERVICE_NAME=htcpcp
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
       - COFFEE_POT_ID=12345678
       - COFFEE_POT_NAME=MyCoffeePot
       - COFFEE_POT_LOCATION=OfficeKitchen
