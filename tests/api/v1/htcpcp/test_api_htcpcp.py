@@ -1,4 +1,5 @@
 from typing import Any
+from unittest.mock import patch
 
 import httpx
 import pytest
@@ -45,10 +46,10 @@ async def reset_state(client: TestClient):
     assert response.status_code == 204
 
 
-# @pytest.fixture(autouse=True)
-# def disable_auth():
-#     with patch("auth_middleware.settings.settings.AUTH_MIDDLEWARE_DISABLED", True):
-#         yield
+@pytest.fixture(autouse=True)
+def disable_auth():
+    with patch("auth_middleware.settings.settings.AUTH_MIDDLEWARE_DISABLED", True):
+        yield
 
 
 @pytest.mark.asyncio
