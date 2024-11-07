@@ -84,7 +84,7 @@ jobs:
           IMAGE_TAG: ${{ env.IMAGE_TAG }}
           IMAGE_BUILD_TAG: ${{ env.IMAGE_BUILD_TAG }}
         run: |
-          docker build -f docker/Dockerfile -t $REPOSITORY:$IMAGE_TAG .
+          docker build -f ./Dockerfile -t $REPOSITORY:$IMAGE_TAG .
           docker tag $REPOSITORY:$IMAGE_TAG $REPOSITORY:$IMAGE_BUILD_TAG
           docker push $REPOSITORY:$IMAGE_TAG
           docker push $REPOSITORY:$IMAGE_BUILD_TAG
