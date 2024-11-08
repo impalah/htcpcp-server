@@ -133,7 +133,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           file: ./Dockerfile.lambda
-          sbom: true
           push: true
           provenance: false
           platforms: linux/amd64
