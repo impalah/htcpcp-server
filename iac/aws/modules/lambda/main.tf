@@ -4,6 +4,19 @@
 
 # Role and policy configurations
 
+resource "aws_iam_role" "lambda_exec_role" {
+  name               = format("%s-%s-%s-lambda_exec_role", var.environment, var.project, var.function_name)
+  assume_role_policy = file("${path.module}/policies/lambda-role-policy.json")
+
+  lifecycle {
+    ignore_changes = [
+      name,
+      assume_role_policy
+    ]
+  }
+}
+
+
 data "aws_iam_policy_document" "lambda_exec_role_policy" {
   statement {
     actions = [
@@ -33,71 +46,54 @@ resource "aws_iam_role_policy" "lambda_exec_role_without_createloggroup" {
 
 }
 
-resource "aws_iam_role" "lambda_exec_role" {
-  name               = format("%s-%s-%s-lambda_exec_role", var.environment, var.project, var.function_name)
-  assume_role_policy = file("${path.module}/policies/lambda-role-policy.json")
+# # Role to connect to VPC
+# resource "aws_iam_role_policy" "lambda_vpc_access" {
+#   name = "lambda_vpc_access"
+#   role = aws_iam_role.lambda_exec_role.id
 
-  lifecycle {
-    ignore_changes = [
-      name,
-      assume_role_policy
-    ]
-  }
+#   policy = file("${path.module}/policies/lambda-exec-role-policy.json")
 
+#   lifecycle {
+#     ignore_changes = [
+#       name,
+#       role,
+#       policy
+#     ]
+#   }
+# }
 
-
-}
-
-# Role to connect to VPC
-resource "aws_iam_role_policy" "lambda_vpc_access" {
-  name = "lambda_vpc_access"
-  role = aws_iam_role.lambda_exec_role.id
-
-  policy = file("${path.module}/policies/lambda-exec-role-policy.json")
-
-  lifecycle {
-    ignore_changes = [
-      name,
-      role,
-      policy
-    ]
-  }
+# resource "aws_security_group" "lambda_sg" {
+#   name        = format("%s-%s-%s-lambda_sg", var.environment, var.project, var.function_name)
+#   description = "Security group for Lambda function to access RDS"
+#   vpc_id      = var.vpc_id
 
 
-}
-
-resource "aws_security_group" "lambda_sg" {
-  name        = format("%s-%s-%s-lambda_sg", var.environment, var.project, var.function_name)
-  description = "Security group for Lambda function to access RDS"
-  vpc_id      = var.vpc_id
-
-
-  dynamic "ingress" {
-    for_each = var.ports
-    content {
-      from_port = ingress.value
-      to_port   = ingress.value
-      protocol  = "tcp"
-      cidr_blocks = [
-        "0.0.0.0/0"
-      ]
-      # TODO: only allow from the load balancer
-      # security_groups = [
-      #   "${aws_security_group.ServiceLBSecurityGroup.id}"
-      # ]
-      description = format("Allow from anyone on port %d", ingress.value)
-    }
-  }
+#   dynamic "ingress" {
+#     for_each = var.ports
+#     content {
+#       from_port = ingress.value
+#       to_port   = ingress.value
+#       protocol  = "tcp"
+#       cidr_blocks = [
+#         "0.0.0.0/0"
+#       ]
+#       # TODO: only allow from the load balancer
+#       # security_groups = [
+#       #   "${aws_security_group.ServiceLBSecurityGroup.id}"
+#       # ]
+#       description = format("Allow from anyone on port %d", ingress.value)
+#     }
+#   }
 
 
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
 
 # Lambda function from ECR image
 resource "aws_lambda_function" "lambda_function" {
@@ -132,10 +128,10 @@ resource "aws_lambda_function" "lambda_function" {
   #   command = [var.function_cmd]
   # }
 
-  vpc_config {
-    subnet_ids         = var.vpc_subnets_ids
-    security_group_ids = [aws_security_group.lambda_sg.id]
-  }
+  # vpc_config {
+  #   subnet_ids         = var.vpc_subnets_ids
+  #   security_group_ids = [aws_security_group.lambda_sg.id]
+  # }
 
   tags = merge(
     # { "Name" = format("%s_%s", var.environment, var.function_name) },
@@ -143,16 +139,16 @@ resource "aws_lambda_function" "lambda_function" {
     var.tags,
   )
 
-  lifecycle {
-    ignore_changes = [
-      image_uri,
-      last_modified,
-      role,
-      timeout,
-      environment,
-      vpc_config
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     image_uri,
+  #     last_modified,
+  #     role,
+  #     timeout,
+  #     environment,
+  #     vpc_config
+  #   ]
+  # }
 
 
 

@@ -112,6 +112,28 @@ docker run -d --name htcpcp-server -p 8000:8000 -e MY_VARIABLE='some value' htcp
 ```
 
 
+## AWS deployment
+
+### ECR repositories (only for CI/CD account)
+
+Create the ECR repositories for the application images
+
+```bash
+$env:AWS_PROFILE="my_profile"; aws ecr create-repository --repository-name htcpcp --region eu-west-1
+
+```
+
+Add permissions to the repository. First, set the accounts that are allowed to access the repo in the ecr_access_policy.json file.
+
+```bash
+$env:AWS_PROFILE="my_profile"; aws --region eu-west-1 ecr set-repository-policy --repository-name htcpcp --policy-text file://src/ecr_access_policy.json
+
+$env:AWS_PROFILE="my_profile"; aws --region eu-west-1 ecr put-lifecycle-policy --repository-name htcpcp --lifecycle-policy-text file://src/ecr_lifecycle_policy.json
+
+```
+
+
+
 ## Development support services
 
 ### OpenTelemetry
