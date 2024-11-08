@@ -125,19 +125,10 @@ jobs:
             ${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.REPOSITORY }}:${{ env.IMAGE_TAG }}
             ${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.REPOSITORY }}:${{ env.IMAGE_BUILD_TAG }}
             ${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.REPOSITORY }}:latest          
-
-      - name: Tag image for AWS ECR
-        run: |
-          docker tag ${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.REPOSITORY }}:${{ env.IMAGE_TAG }} ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.REPOSITORY }}:${{ env.IMAGE_TAG }}
-          docker tag ${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.REPOSITORY }}:${{ env.IMAGE_BUILD_TAG }} ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.REPOSITORY }}:${{ env.IMAGE_BUILD_TAG }}
-          docker tag ${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.REPOSITORY }}:latest ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.REPOSITORY }}:latest
-
-      - name: Push image to AWS ECR
-        run: |
-          docker push ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.REPOSITORY }}:${{ env.IMAGE_TAG }}
-          docker push ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.REPOSITORY }}:${{ env.IMAGE_BUILD_TAG }}
-          docker push ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.REPOSITORY }}:latest
-
+            ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.REPOSITORY }}:${{ env.IMAGE_TAG }}
+            ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.REPOSITORY }}:${{ env.IMAGE_BUILD_TAG }}
+            ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.REPOSITORY }}:latest
+  
       - name: Build and push lambda image
         uses: docker/build-push-action@v6
         with:
@@ -148,14 +139,7 @@ jobs:
           platforms: linux/amd64
           tags: |
             ${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.REPOSITORY }}:${{ env.IMAGE_LAMBDA_TAG }}
-
-      - name: Tag lambda image for AWS ECR
-        run: |
-          docker tag ${{ vars.DOCKER_HUB_USERNAME }}/${{ vars.REPOSITORY }}:${{ env.IMAGE_LAMBDA_TAG }} ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.REPOSITORY }}:${{ env.IMAGE_LAMBDA_TAG }}
-
-      - name: Push lambda image to AWS ECR
-        run: |
-          docker push ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.REPOSITORY }}:${{ env.IMAGE_LAMBDA_TAG }}
+            ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.REPOSITORY }}:${{ env.IMAGE_LAMBDA_TAG }}
 
       - name: Set IMAGE output
         env:
