@@ -10,7 +10,7 @@ module "htcpcp-api" {
   function_memory  = "2048"
   function_storage = "512"
   function_timeout = "300"
-  image            = "impalah/htcpcp-server:0.1.6-lambda"
+  image            = var.image
   env_variables = {
     LOGGER_NAME                                = "htcpcp.Engine"
     LOG_LEVEL                                  = "DEBUG"

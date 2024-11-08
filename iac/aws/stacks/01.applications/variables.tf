@@ -294,6 +294,11 @@ variable "cdn_frontend_domains" {
 }
 
 
+variable "image" {
+  description = "Lambda container image"
+  type        = string
+  default     = null
+}
 
 
 variable "nginx_container_image" {
