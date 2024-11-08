@@ -60,6 +60,7 @@ jobs:
         run: |
           VERSION=$(poetry version | cut -d ' ' -f 2)
           echo "IMAGE_TAG=${VERSION}" >> $GITHUB_ENV
+          echo "IMAGE_LAMBDA_TAG=${VERSION}-lambda" >> $GITHUB_ENV
           echo "IMAGE_BUILD_TAG=${VERSION}.${{ github.run_number }}" >> $GITHUB_ENV
 
       - name: Build documentation
@@ -106,22 +107,17 @@ jobs:
             ${{ vars.DOCKER_HUB_REPOSITORY_NAME }}:${{ env.IMAGE_BUILD_TAG }}
             ${{ vars.DOCKER_HUB_REPOSITORY_NAME }}:latest          
 
-      # - name: Login to Docker Hub
-      #   run: echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
-    
-      # - name: Build and push docker image 
-      #   id: build-image
-      #   env:
-      #     REPOSITORY: ${{ vars.DOCKER_HUB_REPOSITORY_NAME }}
-      #     IMAGE_TAG: ${{ env.IMAGE_TAG }}
-      #     IMAGE_BUILD_TAG: ${{ env.IMAGE_BUILD_TAG }}
-      #   run: |
-      #     docker build -f ./Dockerfile -t $REPOSITORY:$IMAGE_TAG .
-      #     docker tag $REPOSITORY:$IMAGE_TAG $REPOSITORY:$IMAGE_BUILD_TAG
-      #     docker push $REPOSITORY:$IMAGE_TAG
-      #     docker push $REPOSITORY:$IMAGE_BUILD_TAG
-      #     echo "name=image::$REPOSITORY:$IMAGE_TAG"
-          
+      - name: Build and push lambda image
+        uses: docker/build-push-action@v6
+        with:
+          sbom: true
+          push: true
+          provenance: mode=max
+          platforms: linux/amd64
+          tags: |
+            ${{ vars.DOCKER_HUB_REPOSITORY_NAME }}:${{ env.IMAGE_LAMBDA_TAG }}
+                
+
       - name: Set IMAGE output
         env:
           REPOSITORY: ${{ vars.DOCKER_HUB_REPOSITORY_NAME }}
@@ -132,41 +128,30 @@ jobs:
           IMAGE="${REPOSITORY}:${IMAGE_TAG}"
           echo "${IMAGE_TAG}" > ${{ github.workspace }}/image_tag.txt
           echo "image=${IMAGE}" >> $GITHUB_OUTPUT
-
-  # release:
-  #   runs-on: ubuntu-latest
-  #   needs: inspect_build
-  #   environment:
-  #     name: pro
-  #     url: https://github.com
-  #   steps:
-
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          IMAGE_TAG: ${{ env.IMAGE_TAG }}
-          IMAGE_BUILD_TAG: ${{ env.IMAGE_BUILD_TAG }}
-        with:
-          tag_name: ${{ env.IMAGE_TAG }}
-          release_name: ${{ env.IMAGE_TAG }}
-          draft: false
-          prerelease: false
   
-      - name: Upload Release Asset
-        id: upload_release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/image_tag.txt
-          asset_name: image_tag.txt
-          asset_content_type: text/plain
+      # - name: Create Release
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     IMAGE_TAG: ${{ env.IMAGE_TAG }}
+      #     IMAGE_BUILD_TAG: ${{ env.IMAGE_BUILD_TAG }}
+      #   with:
+      #     tag_name: ${{ env.IMAGE_TAG }}
+      #     release_name: ${{ env.IMAGE_TAG }}
+      #     draft: false
+      #     prerelease: false
+  
+      # - name: Upload Release Asset
+      #   id: upload_release
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #     asset_path: ${{ github.workspace }}/image_tag.txt
+      #     asset_name: image_tag.txt
+      #     asset_content_type: text/plain
     
       - name: Archive build artifacts
         uses: actions/upload-artifact@v4

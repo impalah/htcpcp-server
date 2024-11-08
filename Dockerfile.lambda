@@ -16,7 +16,6 @@ RUN cd projects/${package_name} && poetry export -f requirements.txt --output re
 
 FROM public.ecr.aws/lambda/python:3.12
 
-
 # ARGs are needed in all the stages
 ARG package_name=htcpcp
 ARG module_name=htcpcp
@@ -24,15 +23,12 @@ ARG lambda_name
 
 # Install the function's dependencies using file requirements.txt
 # from your project folder.
-
 COPY --from=requirements-stage /tmp/projects/${package_name}/requirements.txt /requirements.txt
 
-RUN  pip3 install -r /requirements.txt --target "${LAMBDA_TASK_ROOT}"
+RUN pip3 install -r /requirements.txt --target "${LAMBDA_TASK_ROOT}"
 
 # Copy function code
-
 COPY ./src/${module_name}/ ${LAMBDA_TASK_ROOT}/${module_name}
 
 # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
-
 CMD ["htcpcp.lambda_main.lambda_handler"]
