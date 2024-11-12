@@ -129,6 +129,7 @@ jobs:
             ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.REPOSITORY }}:${{ env.IMAGE_BUILD_TAG }}
             ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.REPOSITORY }}:latest
   
+      # Lambda manifest requires no provenance
       - name: Build and push lambda image
         uses: docker/build-push-action@v6
         with:

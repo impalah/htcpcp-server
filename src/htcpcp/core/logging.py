@@ -41,9 +41,8 @@ logger.add(
     serialize=False,
     backtrace=True,
     diagnose=True,
-    enqueue=True,
+    enqueue=settings.LOGGER_ENQUEUE,  # Uses multiprocesing for enqueueing the logs (do not use with aws lambda)
 )
-
 
 if settings.OTEL_ENABLED:
     # Create a handler to send the logs to OpenTelemetry

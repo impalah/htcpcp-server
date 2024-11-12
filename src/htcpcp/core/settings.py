@@ -21,6 +21,9 @@ class Settings:
 
     LOGGER_NAME: str = config("LOGGER_NAME", cast=str, default="")
 
+    # Enqueue the logs using multiprocessing
+    LOGGER_ENQUEUE: bool = config("LOGGER_ENQUEUE", cast=bool, default=False)
+
     # CORS Related configurations
     CORS_ALLOWED_ORIGINS: List[str] = json.loads(
         config("CORS_ALLOWED_ORIGINS", cast=str, default="[]")

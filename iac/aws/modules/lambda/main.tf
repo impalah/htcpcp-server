@@ -17,9 +17,10 @@ resource "aws_iam_role" "lambda_exec_role" {
 }
 
 
-data "aws_iam_policy_document" "lambda_exec_role_policy" {
+data "aws_iam_policy_document" "lambda_exec_role_policy_document" {
   statement {
     actions = [
+      "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents"
     ]
@@ -30,10 +31,10 @@ data "aws_iam_policy_document" "lambda_exec_role_policy" {
 
 }
 
-resource "aws_iam_role_policy" "lambda_exec_role_without_createloggroup" {
-  name   = format("%s-%s-lambda_exec_policy_without_createloggroup", var.environment, var.project)
+resource "aws_iam_role_policy" "lambda_exec_role_policy" {
+  name   = format("%s-%s-lambda_exec_policy", var.environment, var.project)
   role   = aws_iam_role.lambda_exec_role.id
-  policy = data.aws_iam_policy_document.lambda_exec_role_policy.json
+  policy = data.aws_iam_policy_document.lambda_exec_role_policy_document.json
 
   lifecycle {
     ignore_changes = [

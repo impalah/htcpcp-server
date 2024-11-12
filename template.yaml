@@ -5,10 +5,15 @@ Resources:
       PackageType: Image
       Architectures:
         - x86_64
-      ImageUri: htcpcp:lambda
+      ImageUri: impalah/htcpcp-server:0.1.13-lambda
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /docs
+            Method: get
     Metadata:
       Dockerfile: Dockerfile.lambda
       DockerContext: .
       DockerTag: lambda
-
 
