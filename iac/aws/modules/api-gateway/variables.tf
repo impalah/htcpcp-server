@@ -16,6 +16,11 @@ variable "tags" {
   default     = {}
 }
 
+variable "protocol_type" {
+  description = "Protocol type"
+  type        = string
+  default     = "HTTP"
+}
 
 variable "vpc_id" {
   description = "ID of the VPC for the RDS instance"
@@ -24,7 +29,7 @@ variable "vpc_id" {
 }
 
 variable "vpc_subnets_ids" {
-  description = "RDS subnets"
+  description = "Subnets"
   type        = set(string)
   default     = []
 }
@@ -34,3 +39,17 @@ variable "aws_lb_listener_arn" {
   type        = string
   default     = null
 }
+
+variable "lambda_function_arn" {
+  description = "Lambda function ARN"
+  type        = string
+  default     = null
+}
+
+variable "lambda_function_name" {
+  description = "Lambda function name"
+  type        = string
+  default     = null
+}
+
+
