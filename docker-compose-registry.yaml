@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  registry:
+    image: registry:2
+    container_name: local-registry
+    environment:
+      REGISTRY_HTTP_TLS_CERTIFICATE: ""
+      REGISTRY_HTTP_TLS_KEY: ""    
+    ports:
+      - "5000:5000"  # Expose registry on port 5000
+    volumes:
+      - registry-data:/var/lib/registry  # Mount the volume to persist the registry data
+    restart: always
+
+volumes:
+  registry-data:
+    driver: local

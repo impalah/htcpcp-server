@@ -36,6 +36,12 @@ body:text {
   
 }
 
+script:pre-request {
+  // Set method to BREW
+  req.setMethod("BREW");
+  
+}
+
 script:post-response {
   // Extract the access_token from the response
   let order_id = res.body.id;

@@ -264,3 +264,14 @@ poetry add opentelemetry-exporter-otlp
 poetry add opentelemetry-instrumentation-fastapi
 ```
 
+
+### Docker registry redirect
+
+On Windows with WSL 2 to access registry using ip address use:
+
+```bash
+netsh interface portproxy add v4tov4 listenport=5000 listenaddress=0.0.0.0 connectport=5000 connectaddress=127.0.0.1
+```
+
+
+

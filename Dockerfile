@@ -28,7 +28,7 @@ RUN apk add --no-cache gcc musl-dev curl-dev
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 
-ENV PORT 8000
+ENV PORT=8000
 
 EXPOSE 8000/tcp
 EXPOSE 80/tcp
