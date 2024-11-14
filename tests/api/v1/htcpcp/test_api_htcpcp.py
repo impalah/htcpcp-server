@@ -6,7 +6,7 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from htcpcp.api.v1.htcpcp.api_htcpcp import api_router
+from htcpcp.api.v1.htcpcp.api import api_router
 
 
 @pytest.fixture(scope="session")
